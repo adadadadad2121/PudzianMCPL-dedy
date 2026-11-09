@@ -30,6 +30,8 @@ import java.util.UUID;
 public class PudzianMCPLDedy extends JavaPlugin implements Listener {
 
     private final Map<UUID, List<ItemStack>> pending = new HashMap<>();
+    // przedmioty wybrane w trakcie smierci - potwierdzane dopiero na MONITOR
+    private final Map<UUID, List<ItemStack>> candidate = new HashMap<>();
     private final Random random = new Random();
     private File dataFile;
 
@@ -51,9 +53,10 @@ public class PudzianMCPLDedy extends JavaPlugin implements Listener {
     // SMIERC
     // ------------------------------------------------------------------
 
-    // HIGHEST - dzieki temu inne pluginy (totem ulaskawienia itp.) zdaza zrobic swoje
-    // na NORMAL/HIGH, a my widzimy efekt koncowy (keepInventory / wyczyszczone dropy).
-    @EventHandler(priority = EventPriority.HIGHEST)
+    // NORMAL - wykonujemy sie PRZED sakiewka dropu (HIGH) i przed totemem ulaskawienia (HIGHEST).
+    // Dzieki temu X% przedmiotow zostaje u ofiary, a reszta (100-X%) zostaje w dropach,
+    // wiec sakiewka zabojcy zbiera tylko to, co zostalo.
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onDeath(PlayerDeathEvent e) {
         if (!getConfig().getBoolean("enabled", true)) return;
 
@@ -63,6 +66,7 @@ public class PudzianMCPLDedy extends JavaPlugin implements Listener {
         if (getConfig().getStringList("disabled-worlds").contains(p.getWorld().getName())) return;
 
         if (getConfig().getBoolean("respect-other-plugins", true) && e.getKeepInventory()) return;
+        if (getConfig().getBoolean("only-when-killed-by-player", false) && p.getKiller() == null) return;
 
         List<ItemStack> drops = e.getDrops();
         if (drops.isEmpty()) return;
@@ -110,13 +114,20 @@ public class PudzianMCPLDedy extends JavaPlugin implements Listener {
             }
         }
 
-        if (kept.isEmpty()) {
-            pending.put(p.getUniqueId(), new ArrayList<>());
-            saveData();
-            return;
-        }
+        candidate.put(p.getUniqueId(), kept);
+    }
 
-        pending.put(p.getUniqueId(), kept);
+    // MONITOR - na koncu sprawdzamy, czy jakis plugin (np. totem ulaskawienia) nie ustawil
+    // keepInventory. Jesli tak, gracz i tak zachowuje caly ekwipunek - nic nie oddajemy,
+    // zeby nie bylo dupa.
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDeathFinal(PlayerDeathEvent e) {
+        UUID id = e.getEntity().getUniqueId();
+        List<ItemStack> kept = candidate.remove(id);
+        if (kept == null) return;
+        if (e.getKeepInventory()) return;
+
+        pending.put(id, kept);
         saveData();
     }
 
