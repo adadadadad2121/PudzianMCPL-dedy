@@ -1,0 +1,26 @@
+name: PudzianMCPL-dedy
+version: '${project.version}'
+main: pl.pudzianmcpl.dedy.PudzianMCPLDedy
+api-version: '1.21'
+author: PudzianMCPL
+description: Procent odzyskiwania przedmiotow po smierci
+# Ladujemy sie po innych pluginach, zeby miec pewnosc, ze ich logika smierci jest znana
+loadbefore: []
+softdepend: []
+
+commands:
+  dedy:
+    description: Komendy pluginu PudzianMCPL-dedy
+    usage: /dedy reload
+    aliases: [pudziandedy]
+
+permissions:
+  pudzianmcpl.dedy.admin:
+    description: Pozwala uzywac /dedy reload
+    default: op
+  pudzianmcpl.dedy.vip:
+    description: Gracz z tym permem ma wiekszy % odzyskiwania (wartosc z configu - vip-percent)
+    default: false
+  pudzianmcpl.dedy.ignore:
+    description: Plugin w ogole nie rusza przedmiotow tego gracza
+    default: false

@@ -1,0 +1,34 @@
+# PudzianMCPL-dedy - % odzyskiwania przedmiotow po smierci
+
+enabled: true
+
+# Ile % przedmiotow gracz zachowuje po smierci (0 - 100)
+percent: 25.0
+
+# Procent dla graczy z permisja pudzianmcpl.dedy.vip (ustaw taki sam jak 'percent', jesli nie uzywasz)
+vip-percent: 40.0
+
+# Jak liczyc:
+#  true  - kazda sztuka w stacku jest losowana osobno (np. 64 klocki -> srednio 16)
+#          pojedyncze przedmioty (miecz, zbroja) maja X% szans, ze wroca w calosci
+#  false - kazdy stack liczony ulamkowo i losowo zaokraglany (praktycznie to samo, szybsze)
+random-per-item: false
+
+# KOMPATYBILNOSC Z INNYMI PLUGINAMI (totem ulaskawienia, sawkiewka itp.)
+# Jesli inny plugin ustawil juz keepInventory dla tej smierci albo sam wyczyscil drop
+# - ten plugin NIE ROBI NIC, wiec nie ma dupa ani bugow.
+respect-other-plugins: true
+
+# Swiaty, w ktorych plugin jest wylaczony (np. swiat z keepInventory albo event)
+disabled-worlds:
+  - world_event
+
+# Czy odzyskane pancerze maja sie od razu zalozyc (jesli slot wolny)
+auto-equip-armor: true
+
+messages:
+  # Ustaw "" zeby wylaczyc wiadomosc
+  recovered: "&aOdzyskales &e{percent}% &aprzedmiotow po smierci &7({count} szt.)"
+  nothing: "&cNie udalo Ci sie odzyskac zadnych przedmiotow po smierci."
+  reloaded: "&aPrzeladowano config PudzianMCPL-dedy."
+  no-permission: "&cNie masz uprawnien."
